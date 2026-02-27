@@ -1,0 +1,12 @@
+// This is a comment, this should definitely be removed.
+
+// Blank space above, should also be removed. Label below should also be removed but counts as a value of zero.
+(START)
+
+// This @TEST call should be line zero and should make a symbol table entry that is at location 16.
+@TEST
+@1
+D=A
+(END)
+@END
+0;JMP

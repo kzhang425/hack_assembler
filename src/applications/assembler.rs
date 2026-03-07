@@ -269,7 +269,7 @@ impl Instructions {
             if let Some(c) = line.chars().nth(0) {
                 if c == '(' {
                     let name = line.trim_matches(label_syms);
-                    if !name.chars().all(char::is_alphabetic) {
+                    if name.chars().all(char::is_numeric) {
                         return Err(consts::LABEL_ERR.to_string());
                     } else {
                         symbol_table_entries.push((name.to_string(), counter + 1));
@@ -396,8 +396,8 @@ fn translate_c_instr(code: &str) -> Result<String, String> {
     // Now the section for comp
     let comp_component = build_comp_string(comp)?;
     let mut final_result = "111".to_string();
-    final_result.push_str(&dest_component);
     final_result.push_str(&comp_component);
+    final_result.push_str(&dest_component);
     final_result.push_str(&jmp_component);
     Ok(final_result)
 }

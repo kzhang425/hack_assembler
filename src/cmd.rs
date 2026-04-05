@@ -11,12 +11,9 @@ pub fn interpret_args(arg_string: &Vec<String>) {
         return;
     }
     let app_mnemonic = arg_string[1].to_uppercase(); // Make whatever was put in case-insensitive
-    match app_mnemonic.as_str() {
-        consts::ASSEMBLER_APP => {
-            applications::assembler::do_assembly(arg_string); // pass in full string from environment args
-        },
-        _ => (),
-    }
+    let mut app_map = ApplicationMap::new();
+    app_map.add_standard_apps();
+    app_map.execute_app_from_mnem(app_mnemonic, arg_string);
 }
 
 struct ApplicationMap {
@@ -29,6 +26,14 @@ impl ApplicationMap {
         Self {
             app_list: HashMap::new(),
         }
+    }
+
+    pub fn add_standard_apps(&mut self) {
+        // Assembler
+        let assembler_title = "Hack Assembler".to_string();
+        let assembler_help = "This takes in a file with Hack Assembly language and converts it directly into binary format.".to_string();
+        let assembler_app = Application::new(assembler_title,assembler_help,applications::assembler::do_assembly);
+        self.add_app(consts::ASSEMBLER_APP.to_string(), assembler_app);
     }
 
     pub fn add_app(&mut self, key: String, app: Application) {
@@ -55,6 +60,7 @@ struct Application {
 }
 
 impl Application {
+    /// Creates a new application, defined by a struct.
     pub fn new(title: String, help_text: String, fnptr: fn(&Vec<String>)) -> Self {
         Self {
             title,
@@ -63,12 +69,13 @@ impl Application {
         }
     }
 
+    /// Executes an application given arguments. The function pointer that represents the entry point into the application must take a data structure like "args" as the parameter.
     pub fn exec_app(&self, args: &Vec<String>) {
         let ptr = self.fnptr;
         ptr(args);
     }
 }
-/// Handles a file path and returns a file ready to manipulate in the context where this function is called. The second paramter, if set to true, indicates a write rather
+/// Handles a file path and returns a file ready to manipulate in the context where this function is called. The second parameter, if set to true, indicates a write rather
 /// than just a read.
 pub fn handle_file_path(file_path: &str, for_write: bool) -> Result<File, &str> {
     let fpath = Path::new(file_path);
